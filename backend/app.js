@@ -7,13 +7,16 @@ const router = express.Router();
 
 const PORT = process.env.PORT || 3001; 
 
-app.get('/', (req, res) => {
-  res.send('Hello World!');
-});
+// app.get('/', (req, res) => {
+//   res.send('Hello World!');
+// });
 
-router.post('/task/data', postTaskHandler);
-router.get('/task/data', getTaskHandler); 
-router.update('/task/data', updateTaskHandler);
+app.use(express.json());
+app.use('/', router);
+
+router.post('/task', postTaskHandler);
+router.get('/task', getTaskHandler); 
+router.put('/task', updateTaskHandler);
 
 
 app.listen(PORT, () => {
