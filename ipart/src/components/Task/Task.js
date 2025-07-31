@@ -7,7 +7,8 @@ function Task() {
     problem: '',
     action: '',
     result: '',
-    time: new Date().toISOString().slice(0, 16) // Default to current date/time
+    time: new Date().toISOString().slice(0, 16), // Default to current date/time
+    completed: false
   });
 
   const [loading, setLoading] = useState(false);
@@ -15,7 +16,11 @@ function Task() {
   const [success, setSuccess] = useState('');
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value, type, checked } = e.target;
+    setForm({ 
+      ...form, 
+      [name]: type === 'checkbox' ? checked : value 
+    });
     // Clear any previous messages when user starts typing
     setError('');
     setSuccess('');
@@ -54,7 +59,8 @@ function Task() {
         problem: '',
         action: '',
         result: '',
-        time: new Date().toISOString().slice(0, 16)
+        time: new Date().toISOString().slice(0, 16),
+        completed: false
       });
 
     } catch (err) {
@@ -145,6 +151,8 @@ function Task() {
             disabled={loading}
           />
         </label>
+
+
         
         <button type="submit" disabled={loading}>
           {loading ? 'Creating Task...' : 'Submit Task'}

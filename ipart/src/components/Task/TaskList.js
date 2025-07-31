@@ -36,6 +36,34 @@ function TaskList() {
     }
   };
 
+  const toggleCompleted = async (taskId, currentCompleted) => {
+    try {
+      const task = tasks.find(t => t.id === taskId);
+      if (!task) return;
+
+      const response = await fetch('http://localhost:3001/task', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...task,
+          completed: !currentCompleted
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const updatedTask = await response.json();
+      setTasks(tasks.map(t => t.id === taskId ? updatedTask : t));
+    } catch (err) {
+      console.error('Error updating task:', err);
+      setError('Failed to update task. Please try again.');
+    }
+  };
+
   useEffect(() => {
     console.log('TaskList component mounted, fetching tasks...');
     fetchTasks();
@@ -75,9 +103,14 @@ function TaskList() {
       ) : (
         <div className="tasks-grid">
           {tasks.map((task) => (
-            <div key={task.id} className="task-card">
+            <div key={task.id} className={`task-card ${task.completed ? 'completed' : ''}`}>
               <div className="task-header">
-                <span className="task-id">#{task.id}</span>
+                <div className="task-header-left">
+                  <span className="task-id">#{task.id}</span>
+                  <span className={`completion-status ${task.completed ? 'completed' : 'pending'}`}>
+                    {task.completed ? '✓ Completed' : '○ Pending'}
+                  </span>
+                </div>
                 <span className="task-time">{formatDate(task.time)}</span>
               </div>
               
@@ -94,6 +127,15 @@ function TaskList() {
                 <div className="task-field">
                   <strong>Result:</strong> {task.result}
                 </div>
+              </div>
+
+              <div className="task-actions">
+                <button 
+                  onClick={() => toggleCompleted(task.id, task.completed)}
+                  className={`toggle-completed-btn ${task.completed ? 'completed' : 'pending'}`}
+                >
+                  {task.completed ? 'Mark as Pending' : 'Mark as Completed'}
+                </button>
               </div>
             </div>
           ))}

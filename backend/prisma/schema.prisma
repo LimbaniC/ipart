@@ -11,12 +11,13 @@ generator client {
 
 
 model Task {
-  id       Int      @id @default(autoincrement())
-  identity String
-  problem  String
-  action   String
-  result   String
-  time     DateTime
+  id        Int      @id @default(autoincrement())
+  identity  String
+  problem   String
+  action    String
+  result    String
+  time      DateTime
+  completed Boolean  @default(false)
 }
 
 

@@ -109,6 +109,27 @@ body {
   font-style: italic;
 }
 
+/* Checkbox styling */
+.checkbox-label {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #4caf50;
+  cursor: pointer;
+}
+
+.checkbox-text {
+  font-weight: 500;
+  color: #2e7d32;
+}
+
 .task-form button {
   background-color: #66bb6a;
   color: white;
@@ -152,6 +173,17 @@ body {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
+.task-card.completed {
+  background-color: #f8f9fa;
+  border-color: #c8e6c9;
+  opacity: 0.8;
+}
+
+.task-card.completed .task-content {
+  text-decoration: line-through;
+  color: #666;
+}
+
 .task-header {
   display: flex;
   justify-content: space-between;
@@ -159,6 +191,12 @@ body {
   margin-bottom: 1rem;
   padding-bottom: 0.5rem;
   border-bottom: 1px solid #f0f0f0;
+}
+
+.task-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .task-id {
@@ -170,6 +208,23 @@ body {
   font-weight: 600;
 }
 
+.completion-status {
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.completion-status.completed {
+  background-color: #e8f5e8;
+  color: #2e7d32;
+}
+
+.completion-status.pending {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
 .task-time {
   color: #666;
   font-size: 0.85rem;
@@ -179,6 +234,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 .task-field {
@@ -188,6 +244,36 @@ body {
 .task-field strong {
   color: #2e7d32;
   font-weight: 600;
+}
+
+.task-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.toggle-completed-btn {
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-weight: 500;
+}
+
+.toggle-completed-btn.completed {
+  background-color: #ff9800;
+}
+
+.toggle-completed-btn.pending {
+  background-color: #4caf50;
+}
+
+.toggle-completed-btn:hover {
+  opacity: 0.9;
 }
 
 .refresh-button,
@@ -233,5 +319,15 @@ body {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
+  }
+  
+  .task-header-left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+  
+  .task-actions {
+    justify-content: center;
   }
 }
