@@ -8,3 +8,4 @@
 - **ADD** - Habit repitions 
 - **ADD** - View archived section
 - **ADD** - Schedule (followed / not - for completing multiple tasks)
+- **ADD** - Analytics dashboard
