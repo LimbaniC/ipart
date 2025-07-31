@@ -1,1 +1,1 @@
-﻿ipart - a daily productivity management web app and tool
+﻿ipart - my daily productivity management web app and tool
