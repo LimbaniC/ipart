@@ -74,7 +74,7 @@
 }
 
 .task-form input[type="text"],
-.task-form input[type="datetime-local"] {
+.task-form input[type="date"] {
   padding: 0.6rem;
   border: 1px solid #b2dfdb;
   border-radius: 8px;
@@ -85,14 +85,14 @@
 }
 
 .task-form input[type="text"]:focus,
-.task-form input[type="datetime-local"]:focus {
+.task-form input[type="date"]:focus {
   outline: none;
   border-color: #81c784;
   box-shadow: 0 0 0 2px rgba(129, 199, 132, 0.2);
 }
 
 .task-form input[type="text"]:disabled,
-.task-form input[type="datetime-local"]:disabled {
+.task-form input[type="date"]:disabled {
   background-color: #f5f5f5;
   color: #999;
   cursor: not-allowed;
@@ -219,7 +219,7 @@
   color: #f57c00;
 }
 
-.task-time {
+.task-date {
   color: #666;
   font-size: 0.85rem;
 }
@@ -244,6 +244,7 @@
   display: flex;
   justify-content: flex-end;
   gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .toggle-completed-btn {
@@ -267,6 +268,31 @@
 }
 
 .toggle-completed-btn:hover {
+  opacity: 0.9;
+}
+
+/* Timer button styles */
+.timer-btn {
+  background-color: #ff5722;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-weight: 500;
+}
+
+.timer-btn.start {
+  background-color: #4caf50;
+}
+
+.timer-btn.stop {
+  background-color: #f44336;
+}
+
+.timer-btn:hover {
   opacity: 0.9;
 }
 

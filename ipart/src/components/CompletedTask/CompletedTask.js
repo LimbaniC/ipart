@@ -18,8 +18,11 @@ const CompletedTask = () => {
             }
             
             const allTasks = await response.json();
-            // Filter only completed tasks
-            const completed = allTasks.filter(task => task.completed === true);
+            console.log('All tasks fetched:', allTasks);
+            
+            // Filter only completed, non-archived tasks
+            const completed = allTasks.filter(task => task.completed === true && !task.archived);
+            console.log('Filtered completed tasks:', completed);
             setCompletedTasks(completed);
         } catch (err) {
             console.error('Error fetching completed tasks:', err);
@@ -31,13 +34,16 @@ const CompletedTask = () => {
 
     const toggleCompleted = async (taskId, currentCompleted) => {
         try {
+            const task = completedTasks.find(t => t.id === taskId);
+            if (!task) return;
+
             const response = await fetch('http://localhost:3001/task', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    id: taskId,
+                    ...task,
                     completed: !currentCompleted
                 }),
             });
@@ -46,11 +52,48 @@ const CompletedTask = () => {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            // Refresh the completed tasks list
-            fetchCompletedTasks();
+            // Refresh the completed tasks list to reflect the changes
+            await fetchCompletedTasks();
         } catch (err) {
             console.error('Error updating task:', err);
             setError('Failed to update task. Please try again.');
+        }
+    };
+
+    const archiveTask = async (taskId) => {
+        try {
+            console.log('Archiving task with ID:', taskId);
+            const task = completedTasks.find(t => t.id === taskId);
+            if (!task) {
+                console.error('Task not found for archiving');
+                return;
+            }
+
+            console.log('Task to archive:', task);
+
+            const response = await fetch('http://localhost:3001/task', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ...task,
+                    archived: true
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const updatedTask = await response.json();
+            console.log('Task archived successfully:', updatedTask);
+
+            // Refresh the completed tasks list to reflect the changes
+            await fetchCompletedTasks();
+        } catch (err) {
+            console.error('Error archiving task:', err);
+            setError('Failed to archive task. Please try again.');
         }
     };
 
@@ -59,7 +102,14 @@ const CompletedTask = () => {
     }, []);
 
     const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleString();
+        return new Date(dateString).toLocaleDateString();
+    };
+
+    const formatTimeSpent = (hours) => {
+        if (hours === 0) return '0h';
+        const wholeHours = Math.floor(hours);
+        const minutes = Math.round((hours - wholeHours) * 60);
+        return minutes > 0 ? `${wholeHours}h ${minutes}m` : `${wholeHours}h`;
     };
 
     if (loading) {
@@ -100,7 +150,7 @@ const CompletedTask = () => {
                                         ✓ Completed
                                     </span>
                                 </div>
-                                <span className="completed-task-time">{formatDate(task.time)}</span>
+                                <span className="completed-task-date">{formatDate(task.date)}</span>
                             </div>
                             
                             <div className="completed-task-content">
@@ -116,6 +166,9 @@ const CompletedTask = () => {
                                 <div className="completed-task-field">
                                     <strong>Result:</strong> {task.result}
                                 </div>
+                                <div className="completed-task-field">
+                                    <strong>Time Spent:</strong> {formatTimeSpent(task.timeSpent)}
+                                </div>
                             </div>
 
                             <div className="completed-task-actions">
@@ -124,6 +177,12 @@ const CompletedTask = () => {
                                     className="toggle-completed-btn completed"
                                 >
                                     Mark as Pending
+                                </button>
+                                <button 
+                                    onClick={() => archiveTask(task.id)}
+                                    className="archive-btn"
+                                >
+                                    Archive
                                 </button>
                             </div>
                         </div>

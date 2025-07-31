@@ -1,5 +1,5 @@
 import express from 'express';
-import { postTaskHandler, getTaskHandler, updateTaskHandler, deleteTaskHandler } from './controllers/taskHandlers.js';
+import { postTaskHandler, getTaskHandler, updateTaskHandler, deleteTaskHandler, toggleTimerHandler } from './controllers/taskHandlers.js';
 
 const app = express();
 const router = express.Router();
@@ -31,10 +31,12 @@ router.post('/task', postTaskHandler);
 router.get('/task', getTaskHandler); 
 router.put('/task', updateTaskHandler);
 router.delete('/task/:id', deleteTaskHandler);
+router.put('/task/:id/timer', toggleTimerHandler);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   console.log(`Test the API at: http://localhost:${PORT}/`);
   console.log(`Tasks endpoint: http://localhost:${PORT}/task`);
+  console.log(`Timer endpoint: http://localhost:${PORT}/task/:id/timer`);
 });
 

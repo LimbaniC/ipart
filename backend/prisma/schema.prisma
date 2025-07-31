@@ -16,8 +16,11 @@ model Task {
   problem   String
   action    String
   result    String
-  time      DateTime
+  date      DateTime
+  timeSpent Float    @default(0)
+  started   Boolean  @default(false)
   completed Boolean  @default(false)
+  archived  Boolean  @default(false)
 }
 
 

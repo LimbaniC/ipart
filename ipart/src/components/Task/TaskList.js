@@ -56,11 +56,33 @@ function TaskList() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const updatedTask = await response.json();
-      setTasks(tasks.map(t => t.id === taskId ? updatedTask : t));
+      // Refresh the task list to reflect the changes
+      await fetchTasks();
     } catch (err) {
       console.error('Error updating task:', err);
       setError('Failed to update task. Please try again.');
+    }
+  };
+
+  const toggleTimer = async (taskId, action) => {
+    try {
+      const response = await fetch(`http://localhost:3001/task/${taskId}/timer`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ action })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // Refresh the task list to reflect the changes
+      await fetchTasks();
+    } catch (err) {
+      console.error('Error toggling timer:', err);
+      setError('Failed to toggle timer. Please try again.');
     }
   };
 
@@ -70,8 +92,18 @@ function TaskList() {
   }, []);
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleString();
+    return new Date(dateString).toLocaleDateString();
   };
+
+  const formatTimeSpent = (hours) => {
+    if (hours === 0) return '0h';
+    const wholeHours = Math.floor(hours);
+    const minutes = Math.round((hours - wholeHours) * 60);
+    return minutes > 0 ? `${wholeHours}h ${minutes}m` : `${wholeHours}h`;
+  };
+
+  // Filter out completed and archived tasks - only show pending, non-archived tasks
+  const pendingTasks = tasks.filter(task => !task.completed && !task.archived);
 
   if (loading) {
     return (
@@ -96,22 +128,22 @@ function TaskList() {
     <div className="task-container">
       <h2>Task List</h2>
       
-      {tasks.length === 0 ? (
+      {pendingTasks.length === 0 ? (
         <div className="no-tasks-message">
-          No tasks found. Create your first task above!
+          No pending tasks found. Create your first task above!
         </div>
       ) : (
         <div className="tasks-grid">
-          {tasks.map((task) => (
-            <div key={task.id} className={`task-card ${task.completed ? 'completed' : ''}`}>
+          {pendingTasks.map((task) => (
+            <div key={task.id} className="task-card">
               <div className="task-header">
                 <div className="task-header-left">
                   <span className="task-id">#{task.id}</span>
-                  <span className={`completion-status ${task.completed ? 'completed' : 'pending'}`}>
-                    {task.completed ? '✓ Completed' : '○ Pending'}
+                  <span className="completion-status pending">
+                    ○ Pending
                   </span>
                 </div>
-                <span className="task-time">{formatDate(task.time)}</span>
+                <span className="task-date">{formatDate(task.date)}</span>
               </div>
               
               <div className="task-content">
@@ -127,14 +159,23 @@ function TaskList() {
                 <div className="task-field">
                   <strong>Result:</strong> {task.result}
                 </div>
+                <div className="task-field">
+                  <strong>Time Spent:</strong> {formatTimeSpent(task.timeSpent)}
+                </div>
               </div>
 
               <div className="task-actions">
                 <button 
                   onClick={() => toggleCompleted(task.id, task.completed)}
-                  className={`toggle-completed-btn ${task.completed ? 'completed' : 'pending'}`}
+                  className="toggle-completed-btn pending"
                 >
-                  {task.completed ? 'Mark as Pending' : 'Mark as Completed'}
+                  Mark as Completed
+                </button>
+                <button 
+                  onClick={() => toggleTimer(task.id, task.started ? 'stop' : 'start')}
+                  className={`timer-btn ${task.started ? 'stop' : 'start'}`}
+                >
+                  {task.started ? 'Stop Timer' : 'Start Timer'}
                 </button>
               </div>
             </div>

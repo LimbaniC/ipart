@@ -7,8 +7,11 @@ function Task() {
     problem: '',
     action: '',
     result: '',
-    time: new Date().toISOString().slice(0, 16), // Default to current date/time
-    completed: false
+    date: new Date().toISOString().slice(0, 10), // Default to current date (YYYY-MM-DD)
+    timeSpent: 0,
+    started: false,
+    completed: false,
+    archived: false
   });
 
   const [loading, setLoading] = useState(false);
@@ -40,7 +43,7 @@ function Task() {
         },
         body: JSON.stringify({
           ...form,
-          time: new Date(form.time).toISOString() // Convert to ISO string for backend
+          date: new Date(form.date).toISOString() // Convert to ISO string for backend
         }),
       });
 
@@ -59,8 +62,11 @@ function Task() {
         problem: '',
         action: '',
         result: '',
-        time: new Date().toISOString().slice(0, 16),
-        completed: false
+        date: new Date().toISOString().slice(0, 10),
+        timeSpent: 0,
+        started: false,
+        completed: false,
+        archived: false
       });
 
     } catch (err) {
@@ -141,17 +147,16 @@ function Task() {
         </label>
         
         <label>
-          Time:
+          Date:
           <input
-            type="datetime-local"
-            name="time"
-            value={form.time}
+            type="date"
+            name="date"
+            value={form.date}
             onChange={handleChange}
             required
             disabled={loading}
           />
         </label>
-
 
         
         <button type="submit" disabled={loading}>

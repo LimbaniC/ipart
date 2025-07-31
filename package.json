@@ -1,0 +1,19 @@
+{
+  "name": "ipart-productivity-app",
+  "version": "1.0.0",
+  "description": "A daily productivity management web app",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "backend": "cd backend && npm start",
+    "frontend": "cd ipart && npm start",
+    "install-all": "npm install && cd backend && npm install && cd ../ipart && npm install",
+    "build": "cd ipart && npm run build"
+  },
+  "keywords": ["productivity", "task-management", "react", "nodejs"],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+} 
