@@ -8,7 +8,7 @@ export const postTaskHandler = async (req, res) => {
             problem,
             action,
             result,
-            date,
+            date: date || new Date().toISOString().slice(0, 10),
             timeSpent: timeSpent || 0,
             started: started || false,
             completed: completed || false,
@@ -80,19 +80,23 @@ export const toggleTimerHandler = async (req, res) => {
             updatedTask = await prismaClient.task.update({
                 where: { id: parseInt(id) },
                 data: {
-                    started: true
+                    started: true,
+                    startedAt: new Date()
                 }
             });
         } else if (action === 'stop') {
+            if (!task.started || !task.startedAt) {
+                return res.status(400).json({ error: 'Timer not started' });
+            }
             // Stop the timer and add time spent
             const currentTime = new Date();
-            const startTime = task.started ? new Date(task.date) : currentTime;
-            const timeSpentHours = (currentTime - startTime) / (1000 * 60 * 60); // Convert to hours
+            const timeSpentHours = (currentTime - new Date(task.startedAt)) / (1000 * 60 * 60); // Convert to hours
             
             updatedTask = await prismaClient.task.update({
                 where: { id: parseInt(id) },
                 data: {
                     started: false,
+                    startedAt: null,
                     timeSpent: task.timeSpent + timeSpentHours
                 }
             });
