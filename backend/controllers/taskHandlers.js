@@ -1,7 +1,7 @@
 import prismaClient from '../prismaClient.js';
 
 export const postTaskHandler = async (req, res) => {
-    const { identity, problem, action, result, date, timeSpent, started, completed, archived } = req.body;
+    const { identity, problem, action, result, repetitions, date, timeSpent, started, completed, archived } = req.body;
     
     try {
         // Create individual entities first
@@ -28,6 +28,7 @@ export const postTaskHandler = async (req, res) => {
                 problem,
                 action,
                 result,
+                repetitions: repetitions || 1,
                 date: date || new Date().toISOString().slice(0, 10),
                 timeSpent: timeSpent || 0,
                 started: started || false,
@@ -71,7 +72,7 @@ export const getTaskHandler = async (req, res) => {
 
 
 export const updateTaskHandler = async (req, res) => {
-    const { id, identity, problem, action, result, date, timeSpent, started, completed, archived } = req.body;
+    const { id, identity, problem, action, result, repetitions, date, timeSpent, started, completed, archived } = req.body;
     const task = await prismaClient.task.update({
         where: { id },
         data: {
@@ -79,6 +80,7 @@ export const updateTaskHandler = async (req, res) => {
             problem,
             action,
             result,
+            repetitions,
             date,
             timeSpent,
             started,
@@ -150,6 +152,77 @@ export const toggleTimerHandler = async (req, res) => {
     } catch (error) {
         console.error('Timer toggle error:', error);
         res.status(500).json({ error: 'Failed to toggle timer' });
+    }
+};
+
+export const searchHandler = async (req, res) => {
+    const { query } = req.query;
+    
+    if (!query || query.trim().length < 2) {
+        return res.json({ tasks: [], identities: [], problems: [], actions: [], results: [] });
+    }
+
+    try {
+        const searchTerm = query.trim();
+
+        // Search in all models
+        const [tasks, identities, problems, actions, results] = await Promise.all([
+            // Search tasks
+            prismaClient.task.findMany({
+                where: {
+                    OR: [
+                        { identity: { contains: searchTerm, mode: 'insensitive' } },
+                        { problem: { contains: searchTerm, mode: 'insensitive' } },
+                        { action: { contains: searchTerm, mode: 'insensitive' } },
+                        { result: { contains: searchTerm, mode: 'insensitive' } }
+                    ]
+                },
+                take: 10
+            }),
+            
+            // Search identities
+            prismaClient.identity.findMany({
+                where: {
+                    description: { contains: searchTerm, mode: 'insensitive' }
+                },
+                take: 10
+            }),
+            
+            // Search problems
+            prismaClient.problem.findMany({
+                where: {
+                    description: { contains: searchTerm, mode: 'insensitive' }
+                },
+                take: 10
+            }),
+            
+            // Search actions
+            prismaClient.action.findMany({
+                where: {
+                    description: { contains: searchTerm, mode: 'insensitive' }
+                },
+                take: 10
+            }),
+            
+            // Search results
+            prismaClient.result.findMany({
+                where: {
+                    description: { contains: searchTerm, mode: 'insensitive' }
+                },
+                take: 10
+            })
+        ]);
+
+        res.json({
+            tasks,
+            identities,
+            problems,
+            actions,
+            results
+        });
+    } catch (error) {
+        console.error('Search error:', error);
+        res.status(500).json({ error: 'Search failed' });
     }
 };
 

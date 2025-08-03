@@ -16,6 +16,7 @@ model Task {
   problem   String
   action    String
   result    String
+  repetitions Int
   date      DateTime?
   startedAt DateTime?
   timeSpent Float    @default(0)

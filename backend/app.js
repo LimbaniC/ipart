@@ -1,5 +1,5 @@
 import express from 'express';
-import { postTaskHandler, getTaskHandler, updateTaskHandler, deleteTaskHandler, toggleTimerHandler } from './controllers/taskHandlers.js';
+import { postTaskHandler, getTaskHandler, updateTaskHandler, deleteTaskHandler, toggleTimerHandler, searchHandler } from './controllers/taskHandlers.js';
 
 const app = express();
 const router = express.Router();
@@ -32,6 +32,7 @@ router.get('/task', getTaskHandler);
 router.put('/task', updateTaskHandler);
 router.delete('/task/:id', deleteTaskHandler);
 router.put('/task/:id/timer', toggleTimerHandler);
+router.get('/search', searchHandler);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
