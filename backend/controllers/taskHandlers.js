@@ -2,19 +2,61 @@ import prismaClient from '../prismaClient.js';
 
 export const postTaskHandler = async (req, res) => {
     const { identity, problem, action, result, date, timeSpent, started, completed, archived } = req.body;
-    const task = await prismaClient.task.create({
-        data: {
-            identity,
-            problem,
-            action,
-            result,
-            date: date || new Date().toISOString().slice(0, 10),
-            timeSpent: timeSpent || 0,
-            started: started || false,
-            completed: completed || false,
-            archived: archived || false
-        }});
-        res.json(task);
+    
+    try {
+        // Create individual entities first
+        const sIdentity = await prismaClient.identity.create({
+            data: { description: identity }
+        });
+
+        const sProblem = await prismaClient.problem.create({
+            data: { description: problem }
+        });
+        
+        const sAction = await prismaClient.action.create({
+            data: { description: action }
+        });
+
+        const sResult = await prismaClient.result.create({
+            data: { description: result }
+        });
+
+        // Create the task with references to the individual entities
+        const task = await prismaClient.task.create({
+            data: {
+                identity,
+                problem,
+                action,
+                result,
+                date: date || new Date().toISOString().slice(0, 10),
+                timeSpent: timeSpent || 0,
+                started: started || false,
+                completed: completed || false,
+                archived: archived || false,
+                // Link to individual entities
+                identityId: sIdentity.id,
+                problemId: sProblem.id,
+                actionId: sAction.id,
+                resultId: sResult.id
+            }
+        });
+
+        // Return the task with all its related entities
+        const taskWithComponents = await prismaClient.task.findUnique({
+            where: { id: task.id },
+            include: {
+                identityRef: true,
+                problemRef: true,
+                actionRef: true,
+                resultRef: true
+            }
+        });
+
+        res.json(taskWithComponents);
+    } catch (error) {
+        console.error('Error creating task:', error);
+        res.status(500).json({ error: 'Failed to create task and components' });
+    }
 };
 
 
